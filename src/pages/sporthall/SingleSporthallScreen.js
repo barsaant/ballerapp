@@ -1,13 +1,13 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import BallerNavigation from "./src/navigation/BallerNavigator";
 
-export default function App() {
+const SingleSporthallScreen = () => {
   return (
-    <BallerNavigation />
+    <View style={styles.container}>
+      <Text>Single Sporthall!</Text>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -17,3 +17,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default SingleSporthallScreen;
