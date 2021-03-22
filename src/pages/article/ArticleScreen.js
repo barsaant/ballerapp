@@ -5,7 +5,7 @@ const ArticleScreen = ({navigation}) => {
   console.log(navigation);
   return (
     <View style={styles.container}>
-      <Text>Article!</Text>
+      <Text style={{ fontFamily: "Montserrat", fontSize: 30 }}>Article!</Text>
       <Button
         title="Go to Details"
         onPress={() => navigation.navigate('Single Article')}
