@@ -1,26 +1,32 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-import HomeScreen from "../pages/home/HomeScreen";
-
-import UserScreen from "../pages/user/UserScreen";
-
-import SporthallScreen from "../pages/sporthall/SporthallScreen";
-import ArticleScreen from "../pages/article/ArticleScreen";
-import UserNavigator from "./userNavigator";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../pages/login/LoginSection/LoginScreen";
+import EmailVerificationScreen from "../pages/login/EmailVerify/EmailVerificationScreen";
+import SingleArticleScreen from "../pages/article/SingleArticleScreen";
+import SingleSporthallScreen from "../pages/sporthall/SingleSporthallScreen";
+import TabNavigator from "./TabNavigator";
 
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const Navigator = () => {
+const BallerNavigator = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name='Home' component={HomeScreen} />
-      <Tab.Screen name='Sporthall' component={SporthallScreen} />
-      <Tab.Screen name='Article' component={ArticleScreen} />
-      <Tab.Screen name='User' component={UserScreen} />
-    </Tab.Navigator>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={TabNavigator} />
+        <Stack.Screen name="Single Article" component={SingleArticleScreen} />
+        <Stack.Screen
+          name="Single Sporthall"
+          component={SingleSporthallScreen}
+        />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen
+          name="EmailVerificationScreen"
+          component={EmailVerificationScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
-export default Navigator;
+export default BallerNavigator;

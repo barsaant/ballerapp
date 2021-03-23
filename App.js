@@ -1,8 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import HomeNavigator from "./src/navigation/HomeNavigator";
-import EmailVerificationScreen from "./src/pages/login/EmailVerify/EmailVerificationScreen";
+import BallerNavigator from "./src/navigation/BallerNavigator";
 import { useFonts } from "expo-font";
 
 export default function App() {
@@ -15,7 +14,7 @@ export default function App() {
   if (!loaded) {
     return null;
   }
-  return <HomeNavigator />;
+  return <BallerNavigator />;
 }
 
 const styles = StyleSheet.create({
