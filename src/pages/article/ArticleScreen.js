@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, Button, Text, View } from "react-native";
 
-const ArticleScreen = ({navigation}) => {
+const ArticleScreen = ({ navigation }) => {
   console.log(navigation);
   return (
     <View style={styles.container}>
-      <Text style={{ fontFamily: "Montserrat", fontSize: 30 }}>Article!</Text>
+      <Text>Article!</Text>
       <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Single Article')}
+        title='Go to Details'
+        onPress={() => navigation.navigate("Single Article")}
       />
     </View>
   );

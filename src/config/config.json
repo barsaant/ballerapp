@@ -1,0 +1,6 @@
+{
+  "SERVER_URL": "http://192.168.1.8:7259/api/v1",
+  "FILE_SERVER_UPLOAD": "http://192.168.1.8:7575/api/v1",
+  "FILE_SERVER_URL": "http://192.168.1.8:7575/uploads",
+  "FILE_SERVER": "http://192.168.1.8:7575"
+}

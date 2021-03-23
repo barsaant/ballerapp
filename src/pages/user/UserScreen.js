@@ -1,10 +1,15 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, Button } from "react-native";
+import LoginScreen from "../login/LoginSection/LoginScreen";
+import EmailVerificationScreen from "../login/EmailVerify/EmailVerificationScreen";
 
-const UserScreen = () => {
+const UserScreen = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text>User!</Text>
+    <View>
+      <Button
+        onPress={() => navigation.navigate("LoginScreen")}
+        title='Login'
+      />
     </View>
   );
 };

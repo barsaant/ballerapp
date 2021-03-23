@@ -1,20 +1,21 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import BallerNavigation from "./src/navigation/BallerNavigator";
+import HomeNavigator from "./src/navigation/HomeNavigator";
+import EmailVerificationScreen from "./src/pages/login/EmailVerify/EmailVerificationScreen";
 import { useFonts } from "expo-font";
 
 export default function App() {
   const [loaded] = useFonts({
-    Montserrat: require("./assets/fonts/Valentime.otf"),
+    PoppinsBold: require("./assets/fonts/Poppins/Poppins-Bold.ttf"),
+    PoppinsRegular: require("./assets/fonts/Poppins/Poppins-Regular.ttf"),
+    MontBold: require("./assets/fonts/Mont-Bold.ttf"),
   });
 
   if (!loaded) {
     return null;
   }
-  return (
-    <BallerNavigation />
-  );
+  return <HomeNavigator />;
 }
 
 const styles = StyleSheet.create({
