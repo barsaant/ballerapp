@@ -81,12 +81,12 @@ const LoginScreen = ({ navigation }) => {
 
   const googleLogin = async () => {
     try {
-      const { type, accessToken, user } = await Google.logInAsync({
+      const { type, idToken, user } = await Google.logInAsync({
         androidClientId: GOOGLE_ANDROID_CLIENT_ID,
         iosClientId: GOOGLE_IOS_CLIEND_ID,
       });
 
-      return { type, googleToken: accessToken, user };
+      return { type, googleToken: idToken, user };
     } catch (e) {
       return { error: e };
     }
@@ -96,8 +96,17 @@ const LoginScreen = ({ navigation }) => {
     const { type, googleToken, error, user } = await googleLogin();
     if (type && googleToken) {
       if (type === "success") {
-        console.log(googleToken);
-        console.log(user);
+        axios
+          .post(`/users/social/google`, {
+            googleToken: googleToken,
+          })
+          .then(async (result) => {
+            await AsyncStorage.setItem("_cu", result.data._cu);
+            await AsyncStorage.setItem("_cr", result.data._cr);
+            await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
+            navigation.navigate("UserScreen");
+          })
+          .catch((err) => console.log(err.response.data));
       } else if (error) {
         console.log("Нэвтрэх хүсэлт цуцлагдлаа");
       }
