@@ -17,7 +17,7 @@ const Navigator = () => {
       <Tab.Screen name='Home' component={HomeScreen} />
       <Tab.Screen name='Sporthall' component={SporthallScreen} />
       <Tab.Screen name='Article' component={ArticleScreen} />
-      <Tab.Screen name='User' component={UserScreen} />
+      <Tab.Screen name='User' component={LoginScreen} />
     </Tab.Navigator>
   );
 };

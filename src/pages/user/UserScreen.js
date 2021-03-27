@@ -5,11 +5,8 @@ import EmailVerificationScreen from "../login/EmailVerify/EmailVerificationScree
 
 const UserScreen = ({ navigation }) => {
   return (
-    <View>
-      <Button
-        onPress={() => navigation.navigate("LoginScreen")}
-        title='Login'
-      />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>UserScreen</Text>
     </View>
   );
 };

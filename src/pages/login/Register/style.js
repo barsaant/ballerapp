@@ -4,16 +4,24 @@ export default StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: 30,
-    paddingVertical: "30%",
+    paddingTop: "20%",
     flex: 1,
-    height: "100%",
     backgroundColor: "#ffffff",
   },
   headerText: {
     width: "100%",
     fontSize: 32,
     fontFamily: "PoppinsBold",
+    marginBottom: "7%",
   },
+
+  formArea: {
+    marginBottom: "8%",
+  },
+  formAreaError: {
+    marginBottom: "2%",
+  },
+
   form: {
     width: "100%",
     alignItems: "center",
@@ -21,11 +29,10 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#E8E6F1",
     height: 40,
-    marginTop: "8%",
     justifyContent: "center",
   },
 
-  inputEmail: {
+  input: {
     width: "90%",
     fontFamily: "PoppinsRegular",
     fontSize: 14,
@@ -50,16 +57,9 @@ export default StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#CC0000",
     height: 40,
-    marginTop: "8%",
     justifyContent: "center",
   },
-  inputEmailError: {
-    width: "80%",
-    fontFamily: "PoppinsRegular",
-    fontSize: 14,
-    color: "#CC0000",
-  },
-  inputEmailWithClearError: {
+  inputError: {
     width: "90%",
     fontFamily: "PoppinsRegular",
     fontSize: 14,
@@ -71,20 +71,15 @@ export default StyleSheet.create({
     fontSize: 14,
     color: "#CC0000",
   },
+
+  textError: {
+    fontSize: 10,
+    fontFamily: "PoppinsItalic",
+    color: "#CC0000",
+  },
   icon: {
     width: "10%",
     alignItems: "center",
-  },
-  forgotPassword: {
-    width: "100%",
-    marginTop: "2%",
-    paddingHorizontal: 5,
-    alignItems: "flex-end",
-  },
-
-  forgotPasswordText: {
-    fontSize: 12,
-    fontFamily: "PoppinsBold",
   },
 
   buttonStyle: {
@@ -98,22 +93,6 @@ export default StyleSheet.create({
     color: "#ffffff",
     fontFamily: "MontBold",
     fontSize: 18,
-  },
-  register: {
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "center",
-    marginTop: "8%",
-  },
-  registerTextFirst: {
-    fontFamily: "PoppinsRegular",
-    fontSize: 12,
-    marginRight: 4,
-  },
-  registerTextSecond: {
-    fontFamily: "PoppinsBold",
-    fontSize: 12,
-    marginLeft: 4,
   },
   or: {
     flexDirection: "row",
