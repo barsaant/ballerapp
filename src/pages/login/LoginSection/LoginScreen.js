@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import axios from "../../../axios/index";
 import styles from "./style";
@@ -145,14 +146,14 @@ const LoginScreen = ({ navigation }) => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.response.error.data.message);
         setError(true);
         setPassword("");
       });
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View>
           <Text style={styles.headerText}>Нэвтрэх</Text>
         </View>
@@ -336,7 +337,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };

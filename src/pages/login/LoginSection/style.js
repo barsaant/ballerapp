@@ -5,8 +5,6 @@ export default StyleSheet.create({
     width: "100%",
     paddingHorizontal: 30,
     paddingVertical: "30%",
-    flex: 1,
-    height: "100%",
     backgroundColor: "#ffffff",
   },
   headerText: {
@@ -137,6 +135,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
+    height: 300,
   },
   socialGoogle: {
     borderWidth: 1,
