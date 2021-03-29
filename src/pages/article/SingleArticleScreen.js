@@ -9,20 +9,39 @@ import {
 } from "react-native";
 import axios from "../../axios/index";
 import config from "../../config/config.json";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import HTML from "react-native-render-html";
 
-const SingleArticleScreen = ({ id }) => {
+const SingleArticleScreen = ({ route }) => {
   const [article, setArticle] = useState({});
-  const getArticle = async () => {
-    try {
-      const result = await axios.get(`articles/${id}`);
-      setArticle(result.data.article);
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-    }
+  const [async, setAsync] = useState([]);
+
+  const getAuth = async () => {
+    let cid = await AsyncStorage.getItem("_cu");
+    let token = await AsyncStorage.getItem("_AUTHtoken");
+    let cr = await AsyncStorage.getItem("_cr");
+    setAsync([cid, cr, token]);
+  };
+  const getArticle = (cid, cr, token) => {
+    axios
+      .get(`articles/${route.params.id}`, {
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => {
+        setArticle(result.data.article);
+        console.log(result.data.article);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
   };
   useEffect(() => {
-    getArticle();
+    getAuth();
+    getArticle(async[0], async[1], async[2]);
   }, []);
   return (
     <SafeAreaView style={styles.container}>
@@ -64,14 +83,7 @@ const SingleArticleScreen = ({ id }) => {
           </View>
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>
-            Наггетс одоогоор барууны 5-р байранд бичигдэж байгаа бөгөөд аварга
-            ЛА ердөө хоёр тоглолт дутуу байна.Алдагдлаа нөхөж, топ-4-ийн үрийг
-            авахын тулд Нугасууд худалдааны донсолгооноос болж магадгүй юм.
-            Цөөхөн хэдэн залуу хэтийн төлөв, драфтын сонголтуудын зардлаар
-            найдвартай гуравдахь хувилбарыг авчрах алхам нь Joker-ийн багийн
-            картанд орж магадгүй юм.
-          </Text>
+          {/*<HTML source={{ html: JSON.parse(article.article) }} /> */}
         </View>
       </ScrollView>
     </SafeAreaView>

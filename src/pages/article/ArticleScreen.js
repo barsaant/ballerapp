@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Button,
   StatusBar,
@@ -11,10 +11,12 @@ import {
   View,
   useWindowDimensions,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Headline from "../../components/article/Headline";
 import ListArticle from "../../components/article/ListArticle";
 import axios from "../../axios/index";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const wait = (timeout) => {
   return new Promise((resolve) => {
@@ -27,8 +29,15 @@ const ArticleScreen = ({ navigation }) => {
   const { width: windowWidth } = useWindowDimensions();
   const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
-  const [article, setArticle] = useState({});
   const [categoryId, setCategoryId] = useState(null);
+  const [async, setAsync] = useState([]);
+
+  const getAuth = async () => {
+    const cid = await AsyncStorage.getItem("_cu");
+    const token = await AsyncStorage.getItem("_AUTHtoken");
+    const cr = await AsyncStorage.getItem("_cr");
+    setAsync([cid, cr, token]);
+  };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -37,48 +46,66 @@ const ArticleScreen = ({ navigation }) => {
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const getAllArticles = async () => {
-    try {
-      const result = await axios.get(`articles/posted`);
-      setArticles(result.data.articles);
-    } catch (error) {
-      console.log(error);
-    }
+  const getHeadlines = () => {
+    axios.get(tag);
   };
-  const getArticles = async () => {
-    try {
-      const result = await axios.get(`categories/${categoryId}`);
-      setArticles(result.data.categoryArticle.articles);
-    } catch (error) {
-      console.log(error);
-    }
+  const getAllArticles = async (cid, cr, token) => {
+    axios
+      .get(`/articles/posted`, {
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => {
+        setArticles(result.data.articles);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
-  const getCategories = async () => {
-    try {
-      const result = await axios.get(`categories`);
-      setCategories(result.data.categories);
-    } catch (error) {
-      console.log(error);
-    }
+  const getArticles = (cid, cr, token) => {
+    axios
+      .get(`/categories/${categoryId}`, {
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => {
+        setArticles(result.data.categoryArticle.articles);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
-  const getArticle = async () => {
-    try {
-      const result = await axios.get(`articles/8`);
-      setArticle(result.data.article);
-      console.log(result.data.article);
-    } catch (error) {
-      console.log(error);
-    }
+  const getCategories = (cid, cr, token) => {
+    axios
+      .get(`/categories`, {
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => {
+        setCategories(result.data.categories);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
+    getAuth();
     if (categoryId === null) {
-      getAllArticles();
+      getAllArticles(async[0], async[1], async[2]);
     } else {
-      getArticles();
+      getArticles(async[0], async[1], async[2]);
     }
-    getArticle();
-    getCategories();
+    getCategories(async[0], async[1], async[2]);
   }, [categoryId]);
 
   return (
@@ -130,18 +157,20 @@ const ArticleScreen = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.categories}
           >
-            <Button
+            <TouchableOpacity
               style={styles.category}
-              title="Бүх мэдээ"
               onPress={() => setCategoryId(null)}
-            />
+            >
+              <Text>Бүх мэдээ</Text>
+            </TouchableOpacity>
             {categories.map((item) => (
-              <Button
+              <TouchableOpacity
                 key={item.categoryId}
                 style={styles.category}
-                title={item.categoryName}
                 onPress={() => setCategoryId(item.categoryId)}
-              />
+              >
+                <Text>{item.categoryName}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
           <FlatList
@@ -149,11 +178,11 @@ const ArticleScreen = ({ navigation }) => {
             data={articles}
             renderItem={({ item }) => (
               <TouchableOpacity
+                activeOpacity={0.75}
                 style={styles.article}
-                onPress={() => {
-                  navigation.navigate("SingleArticle", { id: item.articleId });
-                  console.log(item.articleId);
-                }}
+                onPress={() =>
+                  navigation.navigate("SingleArticle", { id: item.articleId })
+                }
               >
                 <ListArticle key={item.articleId} item={item} />
               </TouchableOpacity>
@@ -190,8 +219,6 @@ const styles = StyleSheet.create({
   },
   category: {
     paddingVertical: 5,
-    borderBottomWidth: 2,
-    borderColor: "#3BBCF8",
     marginHorizontal: 10,
   },
   articles: {

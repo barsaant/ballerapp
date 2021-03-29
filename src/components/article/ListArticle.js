@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import config from "../../config/config.json";
-const Headline = ({ navigation, item }) => {
+const Headline = ({ item }) => {
   function getTomorrow(date) {
     let days = new Date(
       parseInt(date.slice(5, 7)),
