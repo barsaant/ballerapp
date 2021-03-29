@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
+  StatusBar,
   FlatList,
   RefreshControl,
   SafeAreaView,
@@ -26,16 +27,28 @@ const ArticleScreen = ({ navigation }) => {
   const { width: windowWidth } = useWindowDimensions();
   const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [article, setArticle] = useState({});
+  const [categoryId, setCategoryId] = useState(null);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    getArticles();
+    getCategories();
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const getArticles = async () => {
+  const getAllArticles = async () => {
     try {
       const result = await axios.get(`articles/posted`);
       setArticles(result.data.articles);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getArticles = async () => {
+    try {
+      const result = await axios.get(`categories/${categoryId}`);
+      setArticles(result.data.categoryArticle.articles);
     } catch (error) {
       console.log(error);
     }
@@ -48,14 +61,34 @@ const ArticleScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+  const getArticle = async () => {
+    try {
+      const result = await axios.get(`articles/8`);
+      setArticle(result.data.article);
+      console.log(result.data.article);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    getArticles();
+    if (categoryId === null) {
+      getAllArticles();
+    } else {
+      getArticles();
+    }
+    getArticle();
     getCategories();
-  }, [refreshing]);
+  }, [categoryId]);
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar
+        animated={true}
+        hidden={false}
+        barStyle={"dark-content"}
+        backgroundColor={"white"}
+      />
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -97,10 +130,18 @@ const ArticleScreen = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.categories}
           >
+            <Button
+              style={styles.category}
+              title="Бүх мэдээ"
+              onPress={() => setCategoryId(null)}
+            />
             {categories.map((item) => (
-              <Text key={item.categoryId} style={styles.category}>
-                {item.categoryName}
-              </Text>
+              <Button
+                key={item.categoryId}
+                style={styles.category}
+                title={item.categoryName}
+                onPress={() => setCategoryId(item.categoryId)}
+              />
             ))}
           </ScrollView>
           <FlatList
@@ -109,7 +150,10 @@ const ArticleScreen = ({ navigation }) => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.article}
-                onPress={() => navigation.navigate("SingleArticle")}
+                onPress={() => {
+                  navigation.navigate("SingleArticle", { id: item.articleId });
+                  console.log(item.articleId);
+                }}
               >
                 <ListArticle key={item.articleId} item={item} />
               </TouchableOpacity>
@@ -129,7 +173,7 @@ const styles = StyleSheet.create({
   },
   headlines: {
     width: "100%",
-    paddingBottom: 20,
+    paddingVertical: 20,
   },
   headlineTitle: {
     paddingHorizontal: 20,

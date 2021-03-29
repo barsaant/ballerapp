@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import config from "../../config/config.json"
+import config from "../../config/config.json";
 const Headline = ({ navigation, item }) => {
   function getTomorrow(date) {
     let days = new Date(
@@ -77,7 +77,7 @@ const Headline = ({ navigation, item }) => {
       <Image
         style={styles.image}
         source={{
-          uri: `${config.FILE_SERVER_URL}/${item.mediaPath}`,
+          uri: `${config.FILE_SERVER_URL}/${item.thumbnail}`,
         }}
       ></Image>
       <View style={styles.text}>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 120,
     borderRadius: 15,
-    backgroundColor: 'gray',
+    backgroundColor: "gray",
   },
   text: {
     flex: 1,

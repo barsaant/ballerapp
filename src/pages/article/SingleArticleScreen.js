@@ -1,20 +1,39 @@
-import React from "react";
-import { StyleSheet, Text, SafeAreaView, Image, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import React, { useState, useEffect } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  Image,
+  View,
+} from "react-native";
+import axios from "../../axios/index";
+import config from "../../config/config.json";
 
-const SingleArticleScreen = () => {
+const SingleArticleScreen = ({ id }) => {
+  const [article, setArticle] = useState({});
+  const getArticle = async () => {
+    try {
+      const result = await axios.get(`articles/${id}`);
+      setArticle(result.data.article);
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getArticle();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Image
           style={styles.thumbnail}
           source={{
-            uri: "https://reactnative.dev/img/tiny_logo.png",
+            uri: `${config.FILE_SERVER_URL}/${article.thumbnail}`,
           }}
         ></Image>
-        <Text style={styles.title}>
-          Лейкерсийн солилцооны талаархи фрейк вогелийн бодит бодол
-        </Text>
+        <Text style={styles.title}>{article.title}</Text>
         <View style={styles.info}>
           <View style={styles.infoItem}>
             <Image
@@ -79,7 +98,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     flexDirection: "row",
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   infoItem: {
     flexDirection: "row",

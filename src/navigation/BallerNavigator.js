@@ -11,6 +11,7 @@ import UserScreen from "../pages/user/UserScreen";
 import LoginScreen from "../pages/login/LoginSection/LoginScreen";
 import EmailVerificationScreen from "../pages/login/EmailVerify/EmailVerificationScreen";
 import HomeScreen from "../pages/home/HomeScreen";
+import { Button } from "react-native";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,9 +25,27 @@ const HomeStack = () => {
 };
 const ArticleStack = () => {
   return (
-    <Stack.Navigator mode="modal">
-      <Stack.Screen name="Article" component={ArticleScreen} />
-      <Stack.Screen name="SingleArticle" component={SingleArticleScreen} />
+    <Stack.Navigator
+      screenOptions={{
+        headerTitleStyle: {
+          display: "none",
+        },
+      }}
+    >
+      <Stack.Screen
+        name="Article"
+        component={ArticleScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SingleArticle"
+        component={SingleArticleScreen}
+        options={{
+          headerRight: () => (
+            <Button style={{width: 100,}} title="hah" />
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 };
