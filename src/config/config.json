@@ -1,8 +1,8 @@
 {
-  "SERVER_URL": "http://192.168.1.8:7259/api/v1",
-  "FILE_SERVER_UPLOAD": "http://192.168.1.8/api/v1",
-  "FILE_SERVER_URL": "https://fs.baller.mn/uploads",
-  "FILE_SERVER": "http://192.168.1.8:7575",
+  "SERVER_URL": "http://192.168.0.103:7259/api/v1",
+  "FILE_SERVER_UPLOAD": "http://192.168.0.103/api/v1",
+  "FILE_SERVER_URL": "https://192.168.0.103:7575/uploads",
+  "FILE_SERVER": "http://192.168.0.103:7575",
   "FB_APP_ID": "1281413322253796",
   "GOOGLE_ANDROID_CLIENT_ID": "949881451109-28cb740hqfkimn9ce95vm5tq8r9i3rqi.apps.googleusercontent.com",
   "GOOGLE_IOS_CLIEND_ID": "949881451109-3f2cv76sk92jegumnh5gpfrmqdnvb595.apps.googleusercontent.com"

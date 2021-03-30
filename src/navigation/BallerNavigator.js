@@ -41,9 +41,7 @@ const ArticleStack = () => {
         name="SingleArticle"
         component={SingleArticleScreen}
         options={{
-          headerRight: () => (
-            <Button style={{width: 100,}} title="hah" />
-          ),
+          headerRight: () => <Button style={{ width: 100 }} title="hah" />,
         }}
       />
     </Stack.Navigator>
@@ -60,8 +58,13 @@ const SporthallStack = () => {
 const UserStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="UserScreen"
+        component={UserScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
-      <Stack.Screen name="UserScreen" component={UserScreen} />
+
       <Stack.Screen
         name="EmailVerificationScreen"
         component={EmailVerificationScreen}

@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   Image,
   View,
+  ImageBackground,
+  TouchableOpacity,
 } from "react-native";
 import axios from "../../axios/index";
 import config from "../../config/config.json";
@@ -30,7 +32,6 @@ const SingleArticleScreen = ({ route }) => {
       })
       .then((result) => {
         setArticle(result.data.article);
-        console.log(result.data.article);
       })
       .catch((err) => {
         console.log(err.response.data);
@@ -42,12 +43,16 @@ const SingleArticleScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Image
+        <ImageBackground
           style={styles.thumbnail}
           source={{
             uri: `${config.FILE_SERVER_URL}/${article.thumbnail}`,
           }}
-        ></Image>
+        >
+          <TouchableOpacity style={styles.categoryContainer}>
+            <Text style={styles.category}>Медиа</Text>
+          </TouchableOpacity>
+        </ImageBackground>
         <Text style={styles.title}>{article.title}</Text>
         <View style={styles.info}>
           <View style={styles.infoItem}>
@@ -75,7 +80,7 @@ const SingleArticleScreen = ({ route }) => {
                 uri: "https://reactnative.dev/img/tiny_logo.png",
               }}
             ></Image>
-            <Text style={styles.name}>234</Text>
+            <Text style={styles.name}>{article.views}</Text>
           </View>
         </View>
         <View style={styles.textContainer}>
@@ -130,6 +135,20 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 15,
     overflow: "hidden",
+  },
+  categoryContainer: {
+    width: 85,
+    height: 25,
+    position: "absolute",
+    bottom: 15,
+    left: 15,
+    borderRadius: 5,
+    backgroundColor: "#3BBCF8",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  category: {
+    color: "white",
   },
 });
 

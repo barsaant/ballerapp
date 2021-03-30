@@ -1,6 +1,15 @@
 import React from "react";
-import { StyleSheet, Text, View, ImageBackground, Image } from "react-native";
-const Headline = ({ navigation }) => {
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import config from "../../config/config.json";
+
+const Headline = ({ item }) => {
   return (
     <View style={styles.container}>
       <View style={styles.heading}>
@@ -11,22 +20,20 @@ const Headline = ({ navigation }) => {
               uri: "https://reactnative.dev/img/tiny_logo.png",
             }}
           ></Image>
-          <Text style={styles.name}>Baller Crew</Text>
+          <Text style={styles.name}>{item.publisher}</Text>
         </View>
         <Text style={styles.date}>3.24.2021</Text>
       </View>
-      <Text style={styles.title}>
-        Лейкерсийн солилцооны талаархи Фрейк Вогелийн бодит бодол
-      </Text>
+      <Text style={styles.title}>{item.title}</Text>
       <ImageBackground
         source={{
-          uri: "https://reactnative.dev/img/tiny_logo.png",
+          uri: `${config.FILE_SERVER_URL}/${item.thumbnail}`,
         }}
         style={styles.image}
       >
-        <View style={styles.categoryContainer}>
+        <TouchableOpacity style={styles.categoryContainer}>
           <Text style={styles.category}>Медиа</Text>
-        </View>
+        </TouchableOpacity>
       </ImageBackground>
     </View>
   );

@@ -11,7 +11,6 @@ import {
   View,
   useWindowDimensions,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from "react-native";
 import Headline from "../../components/article/Headline";
 import ListArticle from "../../components/article/ListArticle";
@@ -29,8 +28,10 @@ const ArticleScreen = ({ navigation }) => {
   const { width: windowWidth } = useWindowDimensions();
   const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [headlines, setHeadlines] = useState([]);
   const [categoryId, setCategoryId] = useState(null);
   const [async, setAsync] = useState([]);
+  const [refresh, setRefresh] = useState(0);
 
   const getAuth = async () => {
     const cid = await AsyncStorage.getItem("_cu");
@@ -41,13 +42,26 @@ const ArticleScreen = ({ navigation }) => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    getArticles();
-    getCategories();
+    setRefresh((item) => item + 1);
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const getHeadlines = () => {
-    axios.get(tag);
+  const getHeadlines = (cid, cr, token) => {
+    axios
+      .get(`/tagarticles/1`, {
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => {
+        setHeadlines(result.data.tagArticles.articles);
+        console.log(result.data.tagArticles.articles);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const getAllArticles = async (cid, cr, token) => {
     axios
@@ -106,7 +120,8 @@ const ArticleScreen = ({ navigation }) => {
       getArticles(async[0], async[1], async[2]);
     }
     getCategories(async[0], async[1], async[2]);
-  }, [categoryId]);
+    getHeadlines(async[0], async[1], async[2]);
+  }, [categoryId, refresh]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -131,24 +146,18 @@ const ArticleScreen = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             scrollEventThrottle={1}
           >
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
-            <View style={{ width: windowWidth, paddingHorizontal: 20 }}>
-              <Headline />
-            </View>
+            {headlines.map((item) => (
+              <TouchableOpacity
+                key={item.articleId}
+                activeOpacity={0.75}
+                style={{ width: windowWidth, paddingHorizontal: 20 }}
+                onPress={() =>
+                  navigation.navigate("SingleArticle", { id: item.articleId })
+                }
+              >
+                <Headline item={item} />
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
         <View style={styles.newsContainer}>
@@ -158,7 +167,7 @@ const ArticleScreen = ({ navigation }) => {
             style={styles.categories}
           >
             <TouchableOpacity
-              style={styles.category}
+              style={null === categoryId ? styles.active : styles.category}
               onPress={() => setCategoryId(null)}
             >
               <Text>Бүх мэдээ</Text>
@@ -166,7 +175,11 @@ const ArticleScreen = ({ navigation }) => {
             {categories.map((item) => (
               <TouchableOpacity
                 key={item.categoryId}
-                style={styles.category}
+                style={
+                  item.categoryId === categoryId
+                    ? styles.active
+                    : styles.category
+                }
                 onPress={() => setCategoryId(item.categoryId)}
               >
                 <Text>{item.categoryName}</Text>
@@ -220,6 +233,14 @@ const styles = StyleSheet.create({
   category: {
     paddingVertical: 5,
     marginHorizontal: 10,
+    borderBottomWidth: 2,
+    borderColor: "white",
+  },
+  active: {
+    paddingVertical: 5,
+    marginHorizontal: 10,
+    borderBottomWidth: 2,
+    borderColor: "#3BBCF8",
   },
   articles: {
     width: "100%",
