@@ -14,16 +14,13 @@ import HTML from "react-native-render-html";
 
 const SingleArticleScreen = ({ route }) => {
   const [article, setArticle] = useState({});
-  const [async, setAsync] = useState([]);
 
-  const getAuth = async () => {
+  const getArticle = async () => {
     let cid = await AsyncStorage.getItem("_cu");
     let token = await AsyncStorage.getItem("_AUTHtoken");
     let cr = await AsyncStorage.getItem("_cr");
-    setAsync([cid, cr, token]);
-  };
-  const getArticle = (cid, cr, token) => {
-    axios
+
+    await axios
       .get(`articles/${route.params.id}`, {
         headers: {
           Authorization: "Bearer " + token,
@@ -40,8 +37,7 @@ const SingleArticleScreen = ({ route }) => {
       });
   };
   useEffect(() => {
-    getAuth();
-    getArticle(async[0], async[1], async[2]);
+    getArticle();
   }, []);
   return (
     <SafeAreaView style={styles.container}>

@@ -68,6 +68,7 @@ const LoginScreen = ({ navigation }) => {
             facebookToken: token,
           })
           .then(async (result) => {
+            console.log(result.data);
             await AsyncStorage.setItem("_cu", result.data._cu);
             await AsyncStorage.setItem("_cr", result.data._cr);
             await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
@@ -139,7 +140,7 @@ const LoginScreen = ({ navigation }) => {
           await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
           navigation.navigate("EmailVerificationScreen");
         } else {
-          await AsyncStorage.setItem("token", result.data.AUTHtoken);
+          await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
           await AsyncStorage.setItem("_cu", result.data._cu);
           await AsyncStorage.setItem("_cr", result.data._cr);
           navigation.navigate("UserScreen");
