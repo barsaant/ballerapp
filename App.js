@@ -1,6 +1,5 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
 import BallerNavigator from "./src/navigation/BallerNavigator";
 import { useFonts } from "expo-font";
 import { LoginInfo } from "./src/contexts/LoginContext";
@@ -19,16 +18,13 @@ export default function App() {
   }
   return (
     <LoginInfo>
+      <StatusBar
+        animated={true}
+        hidden={false}
+        barStyle={"dark-content"}
+        backgroundColor={"black"}
+      />
       <BallerNavigator />
     </LoginInfo>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

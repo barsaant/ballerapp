@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
-  Button,
-  StatusBar,
   FlatList,
   RefreshControl,
   SafeAreaView,
@@ -15,7 +13,7 @@ import {
 import Headline from "../../components/article/Headline";
 import ListArticle from "../../components/article/ListArticle";
 import axios from "../../axios/index";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoginContext from "../../contexts/LoginContext";
 
 const wait = (timeout) => {
   return new Promise((resolve) => {
@@ -26,19 +24,13 @@ const wait = (timeout) => {
 const ArticleScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const { width: windowWidth } = useWindowDimensions();
+  const data = [];
   const [categories, setCategories] = useState([]);
   const [articles, setArticles] = useState([]);
   const [headlines, setHeadlines] = useState([]);
-  const [categoryId, setCategoryId] = useState(null);
-  const [async, setAsync] = useState([]);
+  const [categoryId, setCategoryId] = useState(0);
   const [refresh, setRefresh] = useState(0);
-
-  const getAuth = async () => {
-    const cid = await AsyncStorage.getItem("_cu");
-    const token = await AsyncStorage.getItem("_AUTHtoken");
-    const cr = await AsyncStorage.getItem("_cr");
-    setAsync([cid, cr, token]);
-  };
+  const loginContext = useContext(LoginContext);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -57,53 +49,42 @@ const ArticleScreen = ({ navigation }) => {
       })
       .then((result) => {
         setHeadlines(result.data.tagArticles.articles);
-        console.log(result.data.tagArticles.articles);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const getAllArticles = async (cid, cr, token) => {
+  const getAllArticles = () => {
     axios
-      .get(`/articles/posted`, {
-        headers: {
-          Authorization: "Bearer " + token,
-          cid: cid,
-          cr: cr,
-        },
-      })
+      .get(`/articles/posted`)
       .then((result) => {
         setArticles(result.data.articles);
+        data.push({
+          id: 0,
+          articles: result.data.articles,
+        });
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const getArticles = (cid, cr, token) => {
+  const getArticles = () => {
     axios
-      .get(`/categories/${categoryId}`, {
-        headers: {
-          Authorization: "Bearer " + token,
-          cid: cid,
-          cr: cr,
-        },
-      })
+      .get(`/categories/${categoryId}`)
       .then((result) => {
         setArticles(result.data.categoryArticle.articles);
+        data.push({
+          id: categoryId,
+          articles: result.data.categoryArticle.articles,
+        });
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  const getCategories = (cid, cr, token) => {
+  const getCategories = () => {
     axios
-      .get(`/categories`, {
-        headers: {
-          Authorization: "Bearer " + token,
-          cid: cid,
-          cr: cr,
-        },
-      })
+      .get(`/categories`)
       .then((result) => {
         setCategories(result.data.categories);
       })
@@ -113,24 +94,21 @@ const ArticleScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getAuth();
-    if (categoryId === null) {
-      getAllArticles(async[0], async[1], async[2]);
+    getCategories();
+    getHeadlines(loginContext.cu, loginContext.cr, loginContext.token);
+  }, [refresh]);
+  useEffect(() => {
+    if (data.some((item) => item.id === categoryId)) {
+      setArticles(data.find((item) => item.id === categoryId).articles);
+    } else if (categoryId === 0) {
+      getAllArticles();
     } else {
-      getArticles(async[0], async[1], async[2]);
+      getArticles();
     }
-    getCategories(async[0], async[1], async[2]);
-    getHeadlines(async[0], async[1], async[2]);
-  }, [categoryId, refresh]);
+  }, [categoryId]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        animated={true}
-        hidden={false}
-        barStyle={"dark-content"}
-        backgroundColor={"white"}
-      />
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -167,8 +145,8 @@ const ArticleScreen = ({ navigation }) => {
             style={styles.categories}
           >
             <TouchableOpacity
-              style={null === categoryId ? styles.active : styles.category}
-              onPress={() => setCategoryId(null)}
+              style={0 === categoryId ? styles.active : styles.category}
+              onPress={() => setCategoryId(0)}
             >
               <Text>Бүх мэдээ</Text>
             </TouchableOpacity>

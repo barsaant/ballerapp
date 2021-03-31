@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,69 +6,66 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import LoginScreen from "../login/LoginSection/LoginScreen";
-import EmailVerificationScreen from "../login/EmailVerify/EmailVerificationScreen";
+import LoginContext from "../../contexts/LoginContext";
 
-const UserScreen = ({ navigation }) => {
+const SettingsScreen = ({ navigation }) => {
+  const loginContext = useContext(LoginContext);
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.imageContainer}>
-          <TouchableOpacity>
-            <Image
-              style={styles.userIcon}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            ></Image>
-          </TouchableOpacity>
-          <Text style={styles.email}>barsaa9237@gmail.com</Text>
-          <TouchableOpacity style={styles.settingsContainer}>
-            <Ionicons name="md-settings-outline" size={30} color="black" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.favHallsContainer}>
-          <View style={styles.heading}>
-            <View style={styles.favTitleContainer}>
-              <Ionicons name="basketball-outline" size={30} color="black" />
-              <Text style={styles.favTitle}>Таалагдсан заалууд</Text>
-            </View>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
+      {loginContext.isLoggedIn ? (
+        <ScrollView>
+          <View style={styles.imageContainer}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={styles.userIconContainer}
+            >
+              <Image
+                style={styles.userIcon}
+                source={{
+                  uri: "https://reactnative.dev/img/tiny_logo.png",
+                }}
+              ></Image>
+              <View style={styles.addIcon}>
+                <Ionicons name="add" size={24} color="white" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.email}>barsaa9237@gmail.com</Text>
+          </View>
+          <View style={styles.buttons}>
+            <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+              <Ionicons name="person-outline" size={30} color="black" />
+              <Text style={styles.title}>Миний мэдээлэл</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+              <Ionicons name="person-add-outline" size={30} color="black" />
+              <Text style={styles.title}>Найзаа урих</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+              <Ionicons name="help-buoy-outline" size={30} color="black" />
+              <Text style={styles.title}>Тусламж</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+              <Ionicons name="log-out-outline" size={30} color="black" />
+              <Text style={styles.title}>Гарах</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
             </TouchableOpacity>
           </View>
-          <ScrollView
-            horizontal={true}
-            style={styles.favHalls}
-            showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={1}
-          >
-            <View style={styles.sporthall}></View>
-            <View style={styles.sporthall}></View>
-            <View style={styles.sporthall}></View>
-            <View style={styles.sporthall}></View>
-            <View style={styles.sporthall}></View>
-          </ScrollView>
+        </ScrollView>
+      ) : (
+        <View style={styles.container}>
+          <Text>Нэвтрэнэ үү!</Text>
+          <Button
+            title="Go to Login"
+            onPress={() => navigation.navigate("LoginScreen")}
+          />
         </View>
-        <View>
-          <View style={styles.heading}>
-            <View style={styles.favTitleContainer}>
-              <Ionicons name="newspaper-outline" size={30} color="black" />
-              <Text style={styles.favTitle}>Таалагдсан нийтлэлүүд</Text>
-            </View>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView
-            style={styles.scrollViewStyle}
-            showsHorizontalScrollIndicator={false}
-            scrollEventThrottle={1}
-          ></ScrollView>
-        </View>
-      </ScrollView>
+      )}
     </View>
   );
 };
@@ -78,14 +75,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  settingsContainer: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-  },
-  settingsIcon: {
-    flex: 1,
-  },
   imageContainer: {
     width: "100%",
     height: 250,
@@ -93,49 +82,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
+  userIconContainer: {
+    position: "relative",
+    marginBottom: 15,
+  },
   userIcon: {
     width: 100,
     height: 100,
-    marginBottom: 15,
     borderRadius: 50,
+  },
+  addIcon: {
+    position: "absolute",
+    backgroundColor: "#2B8FAE",
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    bottom: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
   },
   email: {
     fontSize: 18,
     fontWeight: "bold",
   },
-  favHalls: {
-    borderWidth: 1,
-  },
-  heading: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  buttons: {
     width: "100%",
     paddingHorizontal: 20,
-    alignItems: "center",
   },
-  favHalls: {
-    width: "100%",
-    padding: 20,
-  },
-  favTitleContainer: {
+  button: {
+    height: 60,
+    borderRadius: 15,
     flexDirection: "row",
+    backgroundColor: "#F3F4F8",
     alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
-  favTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginLeft: 5,
-  },
-  seeAll: {
-    fontSize: 14,
-    color: "#6ABF8E",
-  },
-  sporthall: {
-    width: 200,
-    height: 200,
-    borderWidth: 1,
-    marginRight: 20,
+  title: {
+    flex: 1,
+    paddingLeft: 20,
   },
 });
 
-export default UserScreen;
+export default SettingsScreen;

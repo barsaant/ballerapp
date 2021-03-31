@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,21 +8,20 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import axios from "../../axios/index";
 import config from "../../config/config.json";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import HTML from "react-native-render-html";
+import LoginContext from "../../contexts/LoginContext";
 
-const SingleArticleScreen = ({ route }) => {
+const SingleArticleScreen = ({ route, navigation }) => {
+  const loginContext = useContext(LoginContext);
   const [article, setArticle] = useState({});
 
-  const getArticle = async () => {
-    let cid = await AsyncStorage.getItem("_cu");
-    let token = await AsyncStorage.getItem("_AUTHtoken");
-    let cr = await AsyncStorage.getItem("_cr");
-
-    await axios
+  const getArticle = (cid, cr, token) => {
+    axios
       .get(`articles/${route.params.id}`, {
         headers: {
           Authorization: "Bearer " + token,
@@ -38,55 +37,92 @@ const SingleArticleScreen = ({ route }) => {
       });
   };
   useEffect(() => {
-    getArticle();
+    navigation.setOptions({
+      headerLeft: () => (
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.fheadbarButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back-outline" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
+      ),
+      headerRight: () => (
+        <View style={styles.headerButtons}>
+          <TouchableOpacity style={styles.headbarButton}>
+            <Ionicons name="md-arrow-redo-outline" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headbarButton}>
+            <Ionicons name="heart-outline" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+    if (loginContext.isLoggedIn) {
+      getArticle(loginContext.cu, loginContext.cr, loginContext.token);
+    }
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <ImageBackground
-          style={styles.thumbnail}
-          source={{
-            uri: `${config.FILE_SERVER_URL}/${article.thumbnail}`,
-          }}
-        >
-          <TouchableOpacity style={styles.categoryContainer}>
-            <Text style={styles.category}>Медиа</Text>
-          </TouchableOpacity>
-        </ImageBackground>
-        <Text style={styles.title}>{article.title}</Text>
-        <View style={styles.info}>
-          <View style={styles.infoItem}>
-            <Image
-              style={styles.logo}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            ></Image>
-            <Text style={styles.name}>Baller Crew</Text>
+      {loginContext.isLoggedIn ? (
+        <ScrollView>
+          <ImageBackground
+            style={styles.thumbnail}
+            source={{
+              uri: `${config.FILE_SERVER_URL}/${article.thumbnail}`,
+            }}
+          >
+            <TouchableOpacity
+              style={styles.categoryContainer}
+              onPress={() => navigation.navigate("LoginScreen")}
+            >
+              <Text style={styles.category}>Медиа</Text>
+            </TouchableOpacity>
+          </ImageBackground>
+          <Text style={styles.title}>{article.title}</Text>
+          <View style={styles.info}>
+            <View style={styles.infoItem}>
+              <Image
+                style={styles.logo}
+                source={{
+                  uri: "https://reactnative.dev/img/tiny_logo.png",
+                }}
+              ></Image>
+              <Text style={styles.name}>Baller Crew</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Image
+                style={styles.logo}
+                source={{
+                  uri: "https://reactnative.dev/img/tiny_logo.png",
+                }}
+              ></Image>
+              <Text style={styles.name}>2 мин</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Image
+                style={styles.logo}
+                source={{
+                  uri: "https://reactnative.dev/img/tiny_logo.png",
+                }}
+              ></Image>
+              <Text style={styles.name}>{article.views}</Text>
+            </View>
           </View>
-          <View style={styles.infoItem}>
-            <Image
-              style={styles.logo}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            ></Image>
-            <Text style={styles.name}>2 мин</Text>
+          <View style={styles.textContainer}>
+            {/*<HTML source={{ html: JSON.parse(article.article) }} />*/}
           </View>
-          <View style={styles.infoItem}>
-            <Image
-              style={styles.logo}
-              source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
-              }}
-            ></Image>
-            <Text style={styles.name}>{article.views}</Text>
-          </View>
+        </ScrollView>
+      ) : (
+        <View style={styles.container}>
+          <Text>Нэвтрэнэ үү!</Text>
+          <Button
+            title="Go to Login"
+            onPress={() => navigation.navigate("LoginScreen")}
+          />
         </View>
-        <View style={styles.textContainer}>
-          {/*<HTML source={{ html: JSON.parse(article.article) }} /> */}
-        </View>
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
@@ -149,6 +185,27 @@ const styles = StyleSheet.create({
   },
   category: {
     color: "white",
+  },
+  headerButtons: {
+    flexDirection: "row",
+  },
+  headbarButton: {
+    marginRight: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#3BBCF8",
+    borderRadius: 10,
+  },
+  fheadbarButton: {
+    marginLeft: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#3BBCF8",
+    borderRadius: 10,
   },
 });
 
