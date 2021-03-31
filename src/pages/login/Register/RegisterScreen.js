@@ -1,23 +1,19 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Text,
   View,
-  TextInput,
-  Image,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView,
 } from "react-native";
-import axios from "../../../axios/index";
+import LoginContext from "../../../contexts/LoginContext";
 import EmailInput from "./EmailInput";
 import NameInput from "./NameInput";
 import PasswordInput from "./PasswordInput";
 import styles from "./style";
 
 const RegitsterScreen = ({ navigation }) => {
+  const loginContext = useContext(LoginContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +21,6 @@ const RegitsterScreen = ({ navigation }) => {
   const [passwordHide, setPasswordHide] = useState(true);
 
   const [nameError, setNameError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordConfirmError, setPasswordConfirmError] = useState("");
@@ -47,6 +42,14 @@ const RegitsterScreen = ({ navigation }) => {
     setError(false);
     setEmail("");
   };
+
+  useEffect(() => {
+    if (
+      loginContext.emailErrorMessage === "/Бүртгэгдсэн И-мэйл хаяг байна. */"
+    ) {
+      setEmailError("/Бүртгэгдсэн И-мэйл хаяг байна. */");
+    }
+  }, [loginContext.emailErrorMessage]);
 
   const handleSubmitButton = async () => {
     const emailValidation = await validate(email);
@@ -98,29 +101,9 @@ const RegitsterScreen = ({ navigation }) => {
       password.length >= 8 &&
       password === confirmPassword
     ) {
-      await axios
-        .post(`/users/register`, {
-          firstName: capitalizeName,
-          email: email,
-          password: password,
-        })
-        .then(async (result) => {
-          console.log(result);
-          await AsyncStorage.setItem("_cu", result.data._cu);
-          await AsyncStorage.setItem("_cr", result.data._cr);
-          await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
-        })
-        .catch((err) => {
-          console.log(err.response.data.error.message);
-          if (
-            err.response.data.error.message === "Бүртгэгдсэн И-мэйл хаяг байна."
-          ) {
-            setEmailError("/Бүртгэгдсэн И-мэйл хаяг байна. */");
-          }
-        });
+      loginContext.handleRegister(capitalizeName, email, password);
     }
   };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View
@@ -142,6 +125,7 @@ const RegitsterScreen = ({ navigation }) => {
             change={setEmail}
             error={emailError}
             errorChange={setEmailError}
+            loginContext={loginContext}
           />
           <PasswordInput
             text={`Нууц үг`}

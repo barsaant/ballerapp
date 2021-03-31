@@ -4,9 +4,11 @@ import styles from "./style";
 
 const EmailInput = (props) => {
   const [email, setEmail] = useState(props.current);
+  console.log();
   useEffect(() => {
     props.change(email);
     props.errorChange("");
+    props.loginContext.setEmailErrorMessage("");
   }, [email]);
   return (
     <View style={props.error !== "" ? styles.formAreaError : styles.formArea}>

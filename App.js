@@ -1,8 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import BallerNavigator from "./src/navigation/BallerNavigator";
 import { useFonts } from "expo-font";
+import { LoginInfo } from "./src/contexts/LoginContext";
+import CheckLogin from "./src/components/Loader/CheckLogin";
 
 export default function App() {
   const [loaded] = useFonts({
@@ -15,7 +17,11 @@ export default function App() {
   if (!loaded) {
     return null;
   }
-  return <BallerNavigator />;
+  return (
+    <LoginInfo>
+      <BallerNavigator />
+    </LoginInfo>
+  );
 }
 
 const styles = StyleSheet.create({

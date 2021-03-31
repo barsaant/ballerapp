@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -12,6 +12,8 @@ import LoginScreen from "../pages/login/LoginSection/LoginScreen";
 import EmailVerificationScreen from "../pages/login/EmailVerify/EmailVerificationScreen";
 import HomeScreen from "../pages/home/HomeScreen";
 import { Button } from "react-native";
+import LoginContext from "../contexts/LoginContext";
+import CheckLogin from "../components/Loader/CheckLogin";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -19,7 +21,7 @@ const Tab = createBottomTabNavigator();
 const HomeStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name='Home' component={HomeScreen} />
     </Stack.Navigator>
   );
 };
@@ -33,15 +35,15 @@ const ArticleStack = () => {
       }}
     >
       <Stack.Screen
-        name="Article"
+        name='Article'
         component={ArticleScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="SingleArticle"
+        name='SingleArticle'
         component={SingleArticleScreen}
         options={{
-          headerRight: () => <Button style={{ width: 100 }} title="hah" />,
+          headerRight: () => <Button style={{ width: 100 }} title='hah' />,
         }}
       />
     </Stack.Navigator>
@@ -50,38 +52,44 @@ const ArticleStack = () => {
 const SporthallStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Sporthall" component={SporthallScreen} />
-      <Stack.Screen name="SingleSporthall" component={SingleSporthallScreen} />
+      <Stack.Screen name='Sporthall' component={SporthallScreen} />
+      <Stack.Screen name='SingleSporthall' component={SingleSporthallScreen} />
     </Stack.Navigator>
   );
 };
 const UserStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen name='LoginScreen' component={LoginScreen} />
       <Stack.Screen
-        name="UserScreen"
+        name='UserScreen'
         component={UserScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="LoginScreen" component={LoginScreen} />
 
       <Stack.Screen
-        name="EmailVerificationScreen"
+        name='EmailVerificationScreen'
         component={EmailVerificationScreen}
       />
-      <Stack.Screen name="RegisterScreen" component={RegitsterScreen} />
+      <Stack.Screen name='RegisterScreen' component={RegitsterScreen} />
     </Stack.Navigator>
   );
 };
 
 const BallerTab = () => {
+  const loginContext = useContext(LoginContext);
+  console.log(loginContext);
+
+  if (loginContext.loading === true) {
+    return <CheckLogin />;
+  }
   return (
     <NavigationContainer>
       <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeStack} />
-        <Tab.Screen name="Sporthall" component={SporthallStack} />
-        <Tab.Screen name="Article" component={ArticleStack} />
-        <Tab.Screen name="User" component={UserStack} />
+        <Tab.Screen name='Home' component={HomeStack} />
+        <Tab.Screen name='Sporthall' component={SporthallStack} />
+        <Tab.Screen name='Article' component={ArticleStack} />
+        <Tab.Screen name='User' component={UserStack} />
       </Tab.Navigator>
     </NavigationContainer>
   );

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Text,
   View,
@@ -10,109 +10,22 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import axios from "../../../axios/index";
 import styles from "./style";
-import * as Facebook from "expo-facebook";
-import * as Google from "expo-google-app-auth";
-import {
-  FB_APP_ID,
-  GOOGLE_ANDROID_CLIENT_ID,
-  GOOGLE_IOS_CLIEND_ID,
-} from "../../../config/config.json";
+import LoginContext from "../../../contexts/LoginContext";
 
 const LoginScreen = ({ navigation }) => {
+  const loginContext = useContext(LoginContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordHide, setPasswordHide] = useState(true);
-  const [error, setError] = useState(false);
+  const error = loginContext.error;
 
-  const initSocialLogin = async () => {
-    try {
-      await Facebook.initializeAsync({
-        appId: FB_APP_ID,
-      });
-    } catch (e) {
-      console.log(e);
-    }
+  const handleFBLoginPress = () => {
+    loginContext.handleFBLogin();
   };
 
-  useEffect(() => {
-    initSocialLogin();
-  }, []);
-
-  const fbLogin = async () => {
-    try {
-      const { token, type } = await Facebook.logInWithReadPermissionsAsync({
-        permissions: ["public_profile", "email"],
-      });
-
-      const response = await fetch(
-        `https://graph.facebook.com/me?access_token=${token}`
-      );
-
-      const user = await response.json();
-
-      return { type, token, user };
-    } catch (e) {
-      return { error: e };
-    }
-  };
-
-  const handleFBLoginPress = async () => {
-    const { type, token } = await fbLogin();
-
-    if (type && token) {
-      if (type === "success") {
-        await axios
-          .post("/users/social/facebook", {
-            facebookToken: token,
-          })
-          .then(async (result) => {
-            console.log(result.data);
-            await AsyncStorage.setItem("_cu", result.data._cu);
-            await AsyncStorage.setItem("_cr", result.data._cr);
-            await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
-            navigation.navigate("UserScreen");
-          })
-          .catch((err) => console.log(err.response.data.error.message));
-      } else if (error) {
-        console.log("Нэвтрэх хүсэлт цуцлагдлаа");
-      }
-    }
-  };
-
-  const googleLogin = async () => {
-    try {
-      const { type, idToken, user } = await Google.logInAsync({
-        androidClientId: GOOGLE_ANDROID_CLIENT_ID,
-        iosClientId: GOOGLE_IOS_CLIEND_ID,
-      });
-
-      return { type, googleToken: idToken, user };
-    } catch (e) {
-      return { error: e };
-    }
-  };
-
-  const handleGoogleLoginPress = async () => {
-    const { type, googleToken, error, user } = await googleLogin();
-    if (type && googleToken) {
-      if (type === "success") {
-        axios
-          .post(`/users/social/google`, {
-            googleToken: googleToken,
-          })
-          .then(async (result) => {
-            await AsyncStorage.setItem("_cu", result.data._cu);
-            await AsyncStorage.setItem("_cr", result.data._cr);
-            await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
-            navigation.navigate("UserScreen");
-          })
-          .catch((err) => console.log(err.response.data));
-      } else if (error) {
-        console.log("Нэвтрэх хүсэлт цуцлагдлаа");
-      }
-    }
+  const handleGoogleLoginPress = () => {
+    loginContext.handleGoogleLogin();
   };
 
   const eyeButton = () => {
@@ -122,36 +35,22 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const clearButton = () => {
-    setError(false);
+    loginContext.setError(false);
     setEmail("");
   };
 
   const handleSubmitButton = () => {
-    axios
-      .post("/users/login", {
-        email: email,
-        password: password,
-      })
-      .then(async (result) => {
-        if (result.data.emailVerified === false) {
-          console.log("Баталгаажуулах хуудас");
-          await AsyncStorage.setItem("_cu", result.data._cu);
-          await AsyncStorage.setItem("_cr", result.data._cr);
-          await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
-          navigation.navigate("EmailVerificationScreen");
-        } else {
-          await AsyncStorage.setItem("_AUTHtoken", result.data.AUTHtoken);
-          await AsyncStorage.setItem("_cu", result.data._cu);
-          await AsyncStorage.setItem("_cr", result.data._cr);
-          navigation.navigate("UserScreen");
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.error.data.message);
-        setError(true);
-        setPassword("");
-      });
+    loginContext.handleLogin(email, password);
+    console.log("Дарагдлаа");
+    console.log(error);
   };
+
+  useEffect(() => {
+    if (loginContext.error === true) {
+      setPassword("");
+    }
+  }, [loginContext.error]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView style={styles.container}>
@@ -180,7 +79,7 @@ const LoginScreen = ({ navigation }) => {
                 placeholderTextColor={!error ? `#CED2DB` : `#CC0000`}
                 selectionColor={!error ? `#CED2DB` : `#CC0000`}
                 onChangeText={(text) => {
-                  setError(false);
+                  loginContext.setError(false);
                   setEmail(text);
                 }}
               ></TextInput>
@@ -216,7 +115,7 @@ const LoginScreen = ({ navigation }) => {
                 placeholderTextColor={!error ? `#CED2DB` : `#CC0000`}
                 selectionColor={!error ? `#CED2DB` : `#CC0000`}
                 onChangeText={(text) => {
-                  setError(false);
+                  loginContext.setError(false);
                   setEmail(text);
                 }}
               ></TextInput>
@@ -246,7 +145,7 @@ const LoginScreen = ({ navigation }) => {
                 secureTextEntry={passwordHide === true ? true : false}
                 selectionColor={!error ? `#CED2DB` : `#CC0000`}
                 onChangeText={(text) => {
-                  setError(false);
+                  loginContext.setError(false);
                   setPassword(text);
                 }}
               ></TextInput>
@@ -281,7 +180,7 @@ const LoginScreen = ({ navigation }) => {
                 secureTextEntry={passwordHide === true ? true : false}
                 selectionColor={!error ? `#CED2DB` : `#CC0000`}
                 onChangeText={(text) => {
-                  setError(false);
+                  loginContext.setError(false);
                   setPassword(text);
                 }}
               ></TextInput>
