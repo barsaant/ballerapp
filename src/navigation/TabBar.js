@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 const SporthallScreen = ({ state, navigation }) => {
   const { width: windowWidth } = useWindowDimensions();
   const slideAnim = useRef(new Animated.Value(windowWidth / 8 - 25)).current;
-  const hideAnim = useRef(new Animated.Value(1)).current;
+  const [show, setShow] = useState("flex");
 
   const slide = (i) => {
     Animated.timing(slideAnim, {
@@ -21,23 +21,14 @@ const SporthallScreen = ({ state, navigation }) => {
       useNativeDriver: true,
     }).start();
   };
-  const hide = (x) => {
-    Animated.timing(hideAnim, {
-      toValue: x,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-  };
 
   useEffect(() => {
-    Keyboard.addListener("keyboardDidShow", () => hide(0));
-    Keyboard.addListener("keyboardDidHide", () => hide(1));
+    Keyboard.addListener("keyboardDidShow", () => setShow("none"));
+    Keyboard.addListener("keyboardDidHide", () => setShow("flex"));
   }, []);
 
   return (
-    <Animated.View
-      style={[styles.wrapper, { transform: [{ scaleY: hideAnim }] }]}
-    >
+    <View style={[styles.wrapper, { display: show }]}>
       <Animated.View
         style={[styles.runner, { transform: [{ translateX: slideAnim }] }]}
       ></Animated.View>
@@ -101,7 +92,7 @@ const SporthallScreen = ({ state, navigation }) => {
           />
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
