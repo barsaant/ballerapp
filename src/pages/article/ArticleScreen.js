@@ -13,6 +13,7 @@ import {
 import Headline from "../../components/article/Headline";
 import ListArticle from "../../components/article/ListArticle";
 import axios from "../../axios/index";
+import axiosCancel from "axios";
 import LoginContext from "../../contexts/LoginContext";
 
 const wait = (timeout) => {
@@ -38,9 +39,10 @@ const ArticleScreen = ({ navigation }) => {
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const getHeadlines = (cid, cr, token) => {
+  const getHeadlines = (cid, cr, token, source) => {
     axios
       .get(`/tagarticles/1`, {
+        cancelToken: source.token,
         headers: {
           Authorization: "Bearer " + token,
           cid: cid,
@@ -54,9 +56,11 @@ const ArticleScreen = ({ navigation }) => {
         console.log(err);
       });
   };
-  const getAllArticles = () => {
+  const getAllArticles = (source) => {
     axios
-      .get(`/articles/posted`)
+      .get(`/articles/posted`, {
+        cancelToken: source.token,
+      })
       .then((result) => {
         setArticles(result.data.articles);
         data.push({
@@ -68,9 +72,11 @@ const ArticleScreen = ({ navigation }) => {
         console.log(err);
       });
   };
-  const getArticles = () => {
+  const getArticles = (source) => {
     axios
-      .get(`/categories/${categoryId}`)
+      .get(`/categories/${categoryId}`, {
+        cancelToken: source.token,
+      })
       .then((result) => {
         setArticles(result.data.categoryArticle.articles);
         data.push({
@@ -82,9 +88,11 @@ const ArticleScreen = ({ navigation }) => {
         console.log(err);
       });
   };
-  const getCategories = () => {
+  const getCategories = (source) => {
     axios
-      .get(`/categories`)
+      .get(`/categories`, {
+        cancelToken: source.token,
+      })
       .then((result) => {
         setCategories(result.data.categories);
       })
@@ -94,23 +102,28 @@ const ArticleScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    getCategories();
-    getHeadlines(loginContext.cu, loginContext.cr, loginContext.token);
+    const CancelToken = axiosCancel.CancelToken;
+    const source = CancelToken.source();
+    getCategories(source);
+    getHeadlines(loginContext.cu, loginContext.cr, loginContext.token, source);
   }, [refresh]);
   useEffect(() => {
+    const CancelToken = axiosCancel.CancelToken;
+    const source = CancelToken.source();
     if (data.some((item) => item.id === categoryId)) {
       setArticles(data.find((item) => item.id === categoryId).articles);
     } else if (categoryId === 0) {
-      getAllArticles();
+      getAllArticles(source);
     } else {
-      getArticles();
+      getArticles(source);
     }
-  }, [categoryId]);
+  }, [categoryId, refresh]);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
+        stickyHeaderIndices={[1]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -138,48 +151,78 @@ const ArticleScreen = ({ navigation }) => {
             ))}
           </ScrollView>
         </View>
-        <View style={styles.newsContainer}>
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            style={styles.categories}
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          style={styles.categories}
+        >
+          <TouchableOpacity
+            style={styles.category}
+            onPress={() => setCategoryId(0)}
           >
-            <TouchableOpacity
-              style={0 === categoryId ? styles.active : styles.category}
-              onPress={() => setCategoryId(0)}
+            <View
+              style={0 === categoryId ? styles.active : styles.inActive}
+            ></View>
+            <Text
+              style={
+                0 === categoryId
+                  ? styles.categoryNameActive
+                  : styles.categoryNameInActive
+              }
             >
-              <Text>Бүх мэдээ</Text>
-            </TouchableOpacity>
-            {categories.map((item) => (
-              <TouchableOpacity
-                key={item.categoryId}
+              Бүх мэдээ
+            </Text>
+          </TouchableOpacity>
+          {categories.map((item) => (
+            <TouchableOpacity
+              key={item.categoryId}
+              style={styles.category}
+              onPress={() => setCategoryId(item.categoryId)}
+            >
+              <View
                 style={
                   item.categoryId === categoryId
                     ? styles.active
-                    : styles.category
+                    : styles.inActive
                 }
-                onPress={() => setCategoryId(item.categoryId)}
-              >
-                <Text>{item.categoryName}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          <FlatList
-            style={styles.articles}
-            data={articles}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                activeOpacity={0.75}
-                style={styles.article}
-                onPress={() =>
-                  navigation.navigate("SingleArticle", { id: item.articleId })
+              ></View>
+              <Text
+                style={
+                  item.categoryId === categoryId
+                    ? styles.categoryNameActive
+                    : styles.categoryNameInActive
                 }
               >
-                <ListArticle key={item.articleId} item={item} />
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.articleId}
-          />
+                {item.categoryName}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <View style={styles.newsContainer}>
+          {articles.map((item) => (
+            <TouchableOpacity
+              key={item.articleId}
+              activeOpacity={0.75}
+              style={styles.article}
+              onPress={() =>
+                navigation.navigate("SingleArticle", { id: item.articleId })
+              }
+            >
+              <ListArticle key={item.articleId} item={item} />
+            </TouchableOpacity>
+          ))}
+          {articles.map((item) => (
+            <TouchableOpacity
+              key={item.articleId}
+              activeOpacity={0.75}
+              style={styles.article}
+              onPress={() =>
+                navigation.navigate("SingleArticle", { id: item.articleId })
+              }
+            >
+              <ListArticle key={item.articleId} item={item} />
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -190,6 +233,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    position: "relative",
   },
   headlines: {
     width: "100%",
@@ -207,16 +251,30 @@ const styles = StyleSheet.create({
   categories: {
     paddingVertical: 5,
     paddingHorizontal: 15,
+    marginBottom: 30,
+    backgroundColor: "white",
   },
   category: {
-    paddingVertical: 5,
+    position: "relative",
+    height: 35,
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 10,
-    borderBottomWidth: 2,
-    borderColor: "white",
+  },
+  categoryNameActive: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  categoryNameInActive: {
+    fontWeight: "bold",
+    fontSize: 16,
+    opacity: 0.25,
   },
   active: {
-    paddingVertical: 5,
-    marginHorizontal: 10,
+    position: "absolute",
+    top: 0,
+    height: "100%",
+    width: "30%",
     borderBottomWidth: 2,
     borderColor: "#3BBCF8",
   },

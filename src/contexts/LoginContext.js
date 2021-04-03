@@ -127,8 +127,6 @@ export const LoginInfo = (props) => {
   };
 
   const handleLogin = (email, password) => {
-    console.log(email);
-    console.log(password);
     axios
       .post("/users/login", {
         email: email,
@@ -137,11 +135,11 @@ export const LoginInfo = (props) => {
       .then((result) => {
         LoginSuccess(result.data.AUTHtoken, result.data._cu, result.data._cr);
         setIsLoggedIn(true);
-        if (result.data.emailVerified === false) {
-          navigation.navigate("EmailVerificationScreen");
-        } else {
-          navigation.navigate("UserScreen");
-        }
+        // if (result.data.emailVerified === false) {
+        //   navigation.navigate("EmailVerificationScreen");
+        // } else {
+        //   navigation.navigate("UserScreen");
+        // }
       })
       .catch((err) => {
         console.log(err);
@@ -170,6 +168,14 @@ export const LoginInfo = (props) => {
       });
   };
 
+  const logout = async () => {
+    await AsyncStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setToken(null);
+    setCu(null);
+    setCr(null);
+  };
+
   return (
     <LoginContext.Provider
       value={{
@@ -191,6 +197,7 @@ export const LoginInfo = (props) => {
         setEmailErrorMessage,
         loading,
         setLoading,
+        logout,
       }}
     >
       {props.children}

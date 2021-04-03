@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -12,6 +11,8 @@ import EmailVerificationScreen from "../modals/login/EmailVerify/EmailVerificati
 import LoginScreen from "../modals/login/LoginSection/LoginScreen";
 import HomeScreen from "../pages/home/HomeScreen";
 import UserScreen from "../pages/user/UserScreen";
+import FavoriteArticlesScreen from "../pages/user/FavoriteArticlesScreen";
+import FavoriteSporthallsScreen from "../pages/user/FavoriteSporthallsScreen";
 import LoginContext from "../contexts/LoginContext";
 import CheckLogin from "../components/Loader/CheckLogin";
 import TabBar from "./TabBar";
@@ -68,6 +69,20 @@ const UserStack = () => {
         component={UserScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="FavoriteArticlesScreen"
+        component={FavoriteArticlesScreen}
+        options={{
+          title: "Таалагдсан нийтлэлүүд",
+        }}
+      />
+      <Stack.Screen
+        name="FavoriteSporthallsScreen"
+        component={FavoriteSporthallsScreen}
+        options={{
+          title: "Таалагдсан заалууд",
+        }}
+      />
     </Stack.Navigator>
   );
 };
@@ -89,7 +104,7 @@ const RootStack = () => {
     return <CheckLogin />;
   }
   return (
-    <NavigationContainer >
+    <NavigationContainer>
       <Stack.Navigator mode="modal">
         <Stack.Screen
           name="Main"

@@ -13,6 +13,10 @@ import LoginContext from "../../contexts/LoginContext";
 
 const SettingsScreen = ({ navigation }) => {
   const loginContext = useContext(LoginContext);
+  const HandleLogout = () => {
+    loginContext.logout();
+  };
+
   return (
     <View style={styles.container}>
       {loginContext.isLoggedIn ? (
@@ -40,6 +44,24 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.title}>Миний мэдээлэл</Text>
               <Ionicons name="chevron-forward" size={18} color="black" />
             </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={styles.button}
+              onPress={() => navigation.navigate("FavoriteSporthallsScreen")}
+            >
+              <Ionicons name="basketball-outline" size={30} color="black" />
+              <Text style={styles.title}>Таалагдсан заалууд</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={styles.button}
+              onPress={() => navigation.navigate("FavoriteArticlesScreen")}
+            >
+              <Ionicons name="newspaper-outline" size={30} color="black" />
+              <Text style={styles.title}>Таалагдсан нийтлэлүүд</Text>
+              <Ionicons name="chevron-forward" size={18} color="black" />
+            </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5} style={styles.button}>
               <Ionicons name="person-add-outline" size={30} color="black" />
               <Text style={styles.title}>Найзаа урих</Text>
@@ -50,7 +72,11 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.title}>Тусламж</Text>
               <Ionicons name="chevron-forward" size={18} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+            <TouchableOpacity
+              activeOpacity={0.5}
+              style={styles.button}
+              onPress={() => HandleLogout()}
+            >
               <Ionicons name="log-out-outline" size={30} color="black" />
               <Text style={styles.title}>Гарах</Text>
               <Ionicons name="chevron-forward" size={18} color="black" />

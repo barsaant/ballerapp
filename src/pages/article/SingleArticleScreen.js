@@ -11,6 +11,7 @@ import {
   Button,
 } from "react-native";
 import axios from "../../axios/index";
+import axiosCancel from "axios";
 import config from "../../config/config.json";
 import { Ionicons } from "@expo/vector-icons";
 import HTML from "react-native-render-html";
@@ -19,10 +20,26 @@ import LoginContext from "../../contexts/LoginContext";
 const SingleArticleScreen = ({ route, navigation }) => {
   const loginContext = useContext(LoginContext);
   const [article, setArticle] = useState({});
+  const [favArticles, setFavArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const getArticle = (cid, cr, token) => {
+  const getFavs = (cid, cr, token, source) => {
+    axios
+      .get(`favoritearticles`, {
+        cancelToken: source.token,
+        headers: {
+          Authorization: "Bearer " + token,
+          cid: cid,
+          cr: cr,
+        },
+      })
+      .then((result) => setFavArticles(result.data.favoriteArticles));
+  };
+  const getArticle = (cid, cr, token, source) => {
+    setLoading(true);
     axios
       .get(`articles/${route.params.id}`, {
+        cancelToken: source.token,
         headers: {
           Authorization: "Bearer " + token,
           cid: cid,
@@ -34,14 +51,15 @@ const SingleArticleScreen = ({ route, navigation }) => {
       })
       .catch((err) => {
         console.log(err.response.data);
-      });
+      })
+      .finally(() => setLoading(false));
   };
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
         <View style={styles.headerButtons}>
           <TouchableOpacity
-            style={styles.fheadbarButton}
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back-outline" size={20} color="black" />
@@ -60,9 +78,16 @@ const SingleArticleScreen = ({ route, navigation }) => {
       ),
     });
     if (loginContext.isLoggedIn) {
-      getArticle(loginContext.cu, loginContext.cr, loginContext.token);
+      const CancelToken = axiosCancel.CancelToken;
+      const source = CancelToken.source();
+      getArticle(loginContext.cu, loginContext.cr, loginContext.token, source);
     }
   }, []);
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {loginContext.isLoggedIn ? (
@@ -73,12 +98,16 @@ const SingleArticleScreen = ({ route, navigation }) => {
               uri: `${config.FILE_SERVER_URL}/${article.thumbnail}`,
             }}
           >
-            <TouchableOpacity
-              style={styles.categoryContainer}
-              onPress={() => navigation.navigate("LoginScreen")}
-            >
-              <Text style={styles.category}>Медиа</Text>
-            </TouchableOpacity>
+            <View style={styles.categoriesContainer}>
+              {article.categoryArticles.map((element) => {
+                <TouchableOpacity
+                  key={element.categoryId}
+                  style={styles.categoryContainer}
+                >
+                  <Text style={styles.category}>{element.categoryName}</Text>
+                </TouchableOpacity>;
+              })}
+            </View>
           </ImageBackground>
           <Text style={styles.title}>{article.title}</Text>
           <View style={styles.info}>
@@ -89,7 +118,7 @@ const SingleArticleScreen = ({ route, navigation }) => {
                   uri: "https://reactnative.dev/img/tiny_logo.png",
                 }}
               ></Image>
-              <Text style={styles.name}>Baller Crew</Text>
+              <Text style={styles.name}>{article.publisher[0]}</Text>
             </View>
             <View style={styles.infoItem}>
               <Image
@@ -111,7 +140,7 @@ const SingleArticleScreen = ({ route, navigation }) => {
             </View>
           </View>
           <View style={styles.textContainer}>
-            {/*<HTML source={{ html: JSON.parse(article.article) }} />*/}
+            <HTML source={{ html: JSON.parse(article.article) }} />
           </View>
         </ScrollView>
       ) : (
@@ -172,12 +201,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
   },
-  categoryContainer: {
-    width: 85,
-    height: 25,
+  categoriesContainer: {
     position: "absolute",
     bottom: 15,
     left: 15,
+    flexDirection: "row",
+  },
+  categoryContainer: {
+    width: 85,
+    height: 25,
     borderRadius: 5,
     backgroundColor: "#3BBCF8",
     justifyContent: "center",
@@ -198,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3BBCF8",
     borderRadius: 10,
   },
-  fheadbarButton: {
+  backButton: {
     marginLeft: 20,
     width: 40,
     height: 40,

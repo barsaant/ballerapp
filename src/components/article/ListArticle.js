@@ -15,7 +15,7 @@ const Headline = ({ item }) => {
         month: parseInt(date.slice(5, 7)),
         date: parseInt(date.slice(8, 10)) + 1,
       };
-    } else if (current.month < 12) {
+    } else if (date.slice(5, 7) < 12) {
       return {
         year: parseInt(date.slice(0, 4)),
         month: parseInt(date.slice(5, 7)) + 1,
@@ -87,8 +87,8 @@ const Headline = ({ item }) => {
         <View style={styles.dateContainer}>
           <Feather name="clock" size={16} color="black" />
           <Text style={styles.date}>{`${calcDate(
-            item.updatedAt,
-            getTomorrow(item.updatedAt)
+            item.postedAt,
+            getTomorrow(item.postedAt)
           )}`}</Text>
         </View>
       </View>

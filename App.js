@@ -22,7 +22,7 @@ export default function App() {
         animated={true}
         hidden={false}
         barStyle={"dark-content"}
-        backgroundColor={"black"}
+        backgroundColor={"white"}
       />
       <BallerNavigator />
     </LoginInfo>
